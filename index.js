@@ -6,6 +6,7 @@ const fs = require("fs");
 const inquirer = require("inquirer");
 
 const {employeeQues,engineerQues,internQues,managerQues,headerTemp,footerTemp} = require("./src/template.js");
+const { resolve } = require("path");
 
 const [nameQ,idQ,emailQ] = employeeQues;
 const [githubQ] = engineerQues;
@@ -98,31 +99,34 @@ inquirer
         
 })};
 
-function genFile(instArray){
-    console.log(instArray);
-    fs.writeFile("./output/index.html",headerTemp,(err)=>
-    err ? console.log(err):console.log("Html file being Generated..."));
+async function moduleGen(){
+    let x = "";
     instArray.forEach(employee => {
-        switch(employee.role){
-            case("Manager"):
-            fs.appendFile("./output/index.html",employee.temp,(err)=>
-            err ? console.log(err):console.log("Manager Added..."));
-            break;
-            case("Engineer"):
-            fs.appendFile("./output/index.html",employee.temp,(err)=>
-            err ? console.log(err):console.log("Engineer Added..."));
-            break;
-            case("Intern"):
-            fs.appendFile("./output/index.html",employee.temp,(err)=>
-            err ? console.log(err):console.log("Intern Added..."));
-            break;
-            case("Employee"):
-            fs.appendFile("./output/index.html",employee.temp,(err)=>
-            err ? console.log(err):console.log("Employee Added..."));
-            break;
-        }
+        x += employee.temp;
     });
+    return x;
+}
+async function genFile(instArray){
+    console.log(instArray);
+    
+    new Promise((resolve,reject)=>{
+        
+        fs.writeFile("./output/index.html",headerTemp,(err)=>
+        err ? console.log(err):console.log("Html file being Generated..."));
+        resolve();
+    })
+        
+   .then(async()=>{
+    const moduleCont = await moduleGen();
+    fs.appendFile("./output/index.html",moduleCont,(err)=>
+        err ? console.log(err):console.log("Employee(s) added!"));
+   })
+    
+   .then(()=>{
     fs.appendFile("./output/index.html",footerTemp,(err)=>
     err ? console.log(err):console.log("Html file generated!"));
+    resolve();
+   })
 }
+
 objgen();
